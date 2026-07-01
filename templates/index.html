@@ -6,13 +6,14 @@
   <title>Docker Image Compare</title>
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/htmx.js"></script>
+  <script>window.DIC_MAX_IMAGES = {{.MaxImages}};</script>
   <script src="/static/app.js" defer></script>
 </head>
 <body>
   <main>
     <header>
       <h1>Docker Image Compare</h1>
-      <p class="sub">Add 2&ndash;10 images to see how much layer data they share.</p>
+      <p class="sub">Add 2&ndash;{{.MaxImages}} images to see how much layer data they share.</p>
     </header>
 
     {{template "app" .}}
@@ -23,7 +24,7 @@
       <h3>Add images</h3>
       <textarea id="new-image-input" name="newimage" rows="3"
                 placeholder="nginx:latest&#10;ghcr.io/owner/img:tag&#10;alpine" autocomplete="off" autofocus></textarea>
-      <p class="hint">One image per line (up to 10 total). Public images only; Docker Hub names like <code>nginx</code> resolve automatically. Press <kbd>&#8984;/Ctrl</kbd>+<kbd>Enter</kbd> to add.</p>
+      <p class="hint">One image per line (up to {{.MaxImages}} total). Public images only; Docker Hub names like <code>nginx</code> resolve automatically. Press <kbd>&#8984;/Ctrl</kbd>+<kbd>Enter</kbd> to add.</p>
       <p class="modal-error" id="add-error" hidden></p>
       <menu>
         <button type="button" class="secondary" onclick="document.getElementById('add-dialog').close()">Cancel</button>

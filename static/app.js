@@ -14,6 +14,7 @@
     "application/vnd.oci.image.manifest.v1+json",
   ].join(", ");
   var OUR_PATHS = ["/add", "/remove", "/compare"];
+  var MAX_IMAGES = window.DIC_MAX_IMAGES || 10;
 
   // parseRef mirrors the server's reference parsing (Docker Hub defaults included).
   function parseRef(s) {
@@ -192,7 +193,7 @@
     document.querySelectorAll('#app input[name="image"]').forEach(function (i) { add(i.value); });
     var ni = document.getElementById("new-image-input");
     if (ni) ni.value.split("\n").forEach(add);
-    return names.slice(0, 10); // silently capped at the max
+    return names.slice(0, MAX_IMAGES); // silently capped at the max
   }
 
   function selectedPlatform() {

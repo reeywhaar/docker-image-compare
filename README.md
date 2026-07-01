@@ -2,7 +2,7 @@
 
 ## [https://dic.vyrtsev.com](https://dic.vyrtsev.com/?image=alpine%3Alatest&image=ghcr.io%2Freeywhaar%2Fbackio%3Alatest&platform=linux%2Famd64)
 
-A tiny self-hosted web tool that compares **2–10 public Docker images** and shows how much
+A tiny self-hosted web tool that compares **public Docker images** and shows how much
 layer data they **share**.
 
 ![Preview](./preview.png)
@@ -35,7 +35,7 @@ go run .
 # open http://localhost:8080
 ```
 
-Click **+** to add an image (up to 10), add a second one, then pick a platform. Try:
+Click **+** to add an image, add a second one, then pick a platform. Try:
 
 - `nginx:latest` vs `nginx:latest` → 100% shared (sanity check).
 - `node:20` vs `node:20-bookworm` → large shared base, smaller deltas.
@@ -59,6 +59,7 @@ docker run --rm -p 8080:8080 \
 | ------- | --------- | ------------------------------------------------------------------------------------ |
 | `PORT`  | `8080`    | HTTP listen port.                                                                    |
 | `HOST`  | _(unset)_ | Public host/URL of this deployment; embedded in the `User-Agent` sent to registries. |
+| `MAX_IMAGES` | `10` | Most images comparable at once (minimum 2). |
 
 The backend also forwards the inbound request's `X-Forwarded-For` to registries.
 

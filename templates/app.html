@@ -5,7 +5,7 @@
   {{range .Rows}}<input type="hidden" name="image" value="{{.Name}}">{{end}}
 
   <div class="toolbar">
-    <button type="button" class="add" {{if not .CanAdd}}disabled title="Maximum of 10 images"{{else}}title="Add image"{{end}}
+    <button type="button" class="add" {{if not .CanAdd}}disabled title="Maximum of {{.MaxImages}} images"{{else}}title="Add image"{{end}}
             onclick="document.getElementById('add-dialog').showModal()">+</button>
   </div>
 

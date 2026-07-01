@@ -54,6 +54,7 @@ type appView struct {
 	Result       *compare.Comparison
 	Diagram      *diagram.Diagram // relationship diagram, when >= diagramMinImages are compared
 	Error        string           // global error not attributable to a single image
+	MaxImages    int              // the configured upper limit, for UI copy
 }
 
 // diagramMinImages is the image count at which the relationship diagram is shown.
@@ -192,8 +193,16 @@ func stateURL(rows []imageRow, platform string) string {
 	return "/?" + q.Encode()
 }
 
-// maxImages is the most images that can be compared at once.
-const maxImages = 10
+// maxImages is the most images that can be compared at once, from MAX_IMAGES (default 10).
+var maxImages = envInt("MAX_IMAGES", 10)
+
+// envInt reads a positive integer (>= 2) env var, falling back to def.
+func envInt(key string, def int) int {
+	if n, err := strconv.Atoi(os.Getenv(key)); err == nil && n >= 2 {
+		return n
+	}
+	return def
+}
 
 // buildView resolves each image independently — a failure marks only that image's card as
 // invalid (with its error and a retry affordance) rather than blocking the whole view. The
@@ -217,7 +226,7 @@ func (s *server) buildView(ctx context.Context, rawImages []string, selected str
 		}
 	}
 
-	v := appView{CanAdd: len(names) < maxImages, Platform: selected}
+	v := appView{CanAdd: len(names) < maxImages, Platform: selected, MaxImages: maxImages}
 	if len(names) == 0 {
 		return v
 	}
