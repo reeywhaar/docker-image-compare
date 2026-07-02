@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -31,6 +32,7 @@ var staticFS embed.FS
 // and (once compared) its size totals.
 type imageRow struct {
 	Slot      string
+	Index     int // position in the canonical (insertion-order) list; used for removal
 	Name      string
 	Error     string // empty when the image resolved successfully
 	Compared  bool   // true when the size fields below are populated
@@ -46,7 +48,8 @@ func (r imageRow) HasDate() bool { return !r.Created.IsZero() }
 
 // appView is the data passed to the "app" fragment template.
 type appView struct {
-	Rows         []imageRow
+	Rows         []imageRow // canonical, insertion order (drives hidden inputs, slots, state URL)
+	SortedRows   []imageRow // same rows sorted by shared size, for the visible table
 	CanAdd       bool
 	ShowPlatform bool
 	Platforms    []string
@@ -92,6 +95,17 @@ func parseClient(r *http.Request) map[string]clientImage {
 
 // slotLetter maps a zero-based index to its slot label (0 -> "A", 1 -> "B", ...).
 func slotLetter(i int) string { return string(rune('A' + i)) }
+
+// sortedByShared returns a copy of rows ordered by shared size, largest first, so the visible
+// table leads with the most-overlapping images. The sort is stable, so uncompared/errored rows
+// (shared == 0) keep their original relative order at the bottom. Each row keeps its slot
+// letter and Index, so it still cross-references the diagram and removes correctly.
+func sortedByShared(rows []imageRow) []imageRow {
+	out := make([]imageRow, len(rows))
+	copy(out, rows)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Shared > out[j].Shared })
+	return out
+}
 
 type server struct {
 	rc   *registry.Client
@@ -212,7 +226,7 @@ func envInt(key string, def int) int {
 // When client holds browser-resolved data for an image, it is used in place of a registry
 // fetch (offloading the server); any image absent from client (or whose data doesn't cover
 // the chosen platform) falls back to a server-side fetch.
-func (s *server) buildView(ctx context.Context, rawImages []string, selected string, client map[string]clientImage) appView {
+func (s *server) buildView(ctx context.Context, rawImages []string, selected string, client map[string]clientImage) (v appView) {
 	var names []string
 	seen := map[string]bool{}
 	for _, im := range rawImages {
@@ -226,7 +240,7 @@ func (s *server) buildView(ctx context.Context, rawImages []string, selected str
 		}
 	}
 
-	v := appView{CanAdd: len(names) < maxImages, Platform: selected, MaxImages: maxImages}
+	v = appView{CanAdd: len(names) < maxImages, Platform: selected, MaxImages: maxImages}
 	if len(names) == 0 {
 		return v
 	}
@@ -258,8 +272,9 @@ func (s *server) buildView(ctx context.Context, rawImages []string, selected str
 
 	v.Rows = make([]imageRow, len(names))
 	for i, im := range names {
-		v.Rows[i] = imageRow{Slot: slotLetter(i), Name: im, Error: res[i].err}
+		v.Rows[i] = imageRow{Slot: slotLetter(i), Index: i, Name: im, Error: res[i].err}
 	}
+	defer func() { v.SortedRows = sortedByShared(v.Rows) }()
 
 	// The valid subset drives platform selection and the comparison.
 	var validIdx []int

@@ -40,10 +40,14 @@
   <div class="table-wrap">
     <table class="totals">
       <thead>
-        <tr><th></th><th>Image</th><th>Total</th><th>Shared</th><th>Unique</th><th>Layers</th><th></th></tr>
+        <tr><th></th><th>Image</th><th>Total</th><th>Shared</th><th>Unique</th><th>Layers</th>
+          <th class="clear-cell">
+            <button type="button" class="remove" title="Remove all images" aria-label="Remove all images"
+                    onclick="if(confirm('Remove all images?'))location.href='/'">&times;</button>
+          </th></tr>
       </thead>
       <tbody>
-        {{range $i, $r := .Rows}}
+        {{range $r := .SortedRows}}
         <tr {{if $r.Error}}class="invalid"{{end}}>
           <td class="slot-cell"><span class="slot">{{$r.Slot}}</span></td>
           <td class="name">
@@ -61,7 +65,7 @@
                     hx-post="/compare" hx-include="#app" hx-target="#app" hx-swap="outerHTML">&#x21bb;</button>
             {{end}}
             <button type="button" class="remove" title="Remove"
-                    hx-post="/remove" hx-vals='{"remove":"{{$i}}"}'
+                    hx-post="/remove" hx-vals='{"remove":"{{$r.Index}}"}'
                     hx-include="#app" hx-target="#app" hx-swap="outerHTML">&times;</button>
           </td>
         </tr>

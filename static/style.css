@@ -107,6 +107,32 @@ header h1 {
 .retry:hover {
   color: var(--accent);
 }
+/* While a remove/retry request is in flight, swap the glyph for a spinner and dim the affected
+   row, so the click has immediate feedback before the table re-renders. htmx adds the
+   .htmx-request class to the clicked button for the duration of its request. */
+.remove.htmx-request,
+.retry.htmx-request {
+  color: transparent;
+  pointer-events: none;
+  position: relative;
+}
+.remove.htmx-request::after,
+.retry.htmx-request::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.85rem;
+  height: 0.85rem;
+  margin: -0.425rem 0 0 -0.425rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--muted);
+  border-radius: 50%;
+  animation: dic-spin 0.6s linear infinite;
+}
+table.totals tbody tr:has(.htmx-request) {
+  opacity: 0.45;
+}
 
 .toolbar {
   width: 100%;
@@ -391,7 +417,8 @@ table.totals tr.invalid td {
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-wrap: anywhere;
 }
-.row-actions {
+.row-actions,
+table.totals th.clear-cell {
   text-align: right;
   white-space: nowrap;
 }
