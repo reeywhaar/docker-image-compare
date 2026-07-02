@@ -202,31 +202,46 @@ table.totals tbody tr:has(.htmx-request) {
   margin-top: 1.5rem;
 }
 
-.shared {
+/* Summary metrics: a row of tiles, each a headline value + caption. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+}
+.stat {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.35rem 1rem;
   text-align: center;
-  margin: 1.5rem 0 1rem;
 }
-.shared-size {
-  font-size: 2.6rem;
+.stat-value {
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--ok);
+  color: var(--text);
+  line-height: 1.1;
 }
-.shared-size.low {
+.stat.low .stat-value {
   color: var(--danger);
 }
-.shared-size.mid {
+.stat.mid .stat-value {
   color: var(--warn);
 }
-.shared-size.high {
+.stat.high .stat-value {
   color: var(--ok);
 }
-.shared-label {
+.stat-label {
+  margin-top: 0.4rem;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+@media (max-width: 560px) {
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
 }
 
 /* Relationship diagram */
@@ -332,7 +347,7 @@ svg.diagram {
   margin-top: 1.5rem;
   overflow-x: auto;
 }
-.shared + .table-wrap {
+.stats + .table-wrap {
   margin-top: 0;
 }
 table.totals {

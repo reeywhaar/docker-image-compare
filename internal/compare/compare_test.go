@@ -35,6 +35,18 @@ func TestImagesPair(t *testing.T) {
 	if c.Images[1].Shared != 250 || c.Images[1].Unique != 999 {
 		t.Errorf("B shared/unique = %d/%d, want 250/999", c.Images[1].Shared, c.Images[1].Unique)
 	}
+	// AvgSharedPct = mean(250/350, 250/1249) = mean(71.4%, 20.0%) = 45.7%
+	if got := c.AvgSharedPct(); got < 45 || got > 46 {
+		t.Errorf("AvgSharedPct = %.2f, want ~45.7", got)
+	}
+	// PooledSharedPct = (250+250)/(350+1249) = 500/1599 = 31.3%
+	if got := c.PooledSharedPct(); got < 31 || got > 32 {
+		t.Errorf("PooledSharedPct = %.2f, want ~31.3", got)
+	}
+	// AvgSharedSize = (250+250)/2 = 250
+	if got := c.AvgSharedSize(); got != 250 {
+		t.Errorf("AvgSharedSize = %d, want 250", got)
+	}
 }
 
 func TestImagesMany(t *testing.T) {

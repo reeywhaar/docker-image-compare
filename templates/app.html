@@ -30,9 +30,19 @@
   {{end}}
 
   {{with .Result}}
-  <div class="shared">
-    <div class="shared-size {{.SharedClass}}">{{humanSize .Shared}}</div>
-    <div class="shared-label">shared (compressed) by all {{len .Images}} images &middot; {{.NumShared}} layer(s) &middot; {{printf "%.0f%%" .SharedPct}} of the smallest</div>
+  <div class="stats">
+    <div class="stat {{.AvgSharedClass}}">
+      <div class="stat-value">{{printf "%.0f%%" .AvgSharedPct}}</div>
+      <div class="stat-label">avg shared per image</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">{{printf "%.0f%%" .PooledSharedPct}}</div>
+      <div class="stat-label">of all layer data is shared</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">{{humanSize .AvgSharedSize}}</div>
+      <div class="stat-label">avg shared size per image</div>
+    </div>
   </div>
   {{end}}
 
