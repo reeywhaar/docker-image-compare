@@ -1,4 +1,4 @@
-# docker-image-compare
+# <img src="./static/favicon.svg" width="28" height="28" align="top" alt=""> docker-image-compare
 
 ## [https://dic.vyrtsev.com](https://dic.vyrtsev.com/?image=alpine%3Alatest&image=ghcr.io%2Freeywhaar%2Fbackio%3Alatest&platform=linux%2Famd64)
 

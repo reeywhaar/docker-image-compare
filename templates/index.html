@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Docker Image Compare</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/htmx.js"></script>
   <script>window.DIC_MAX_IMAGES = {{.MaxImages}};</script>
@@ -13,7 +14,7 @@
   <main>
     <header>
       <div class="header-text">
-        <h1>Docker Image Compare</h1>
+        <h1><img class="logo" src="/static/favicon.svg" width="28" height="28" alt="">Docker Image Compare</h1>
         <p class="sub">Add 2&ndash;{{.MaxImages}} images to see how much layer data they share.</p>
       </div>
       <a class="gh-link" href="https://github.com/Reeywhaar/docker-image-compare"
