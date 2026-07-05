@@ -65,10 +65,10 @@
             {{if $r.HasDate}}<div class="row-date" title="{{isodate $r.Created}}">released {{reltime $r.Created}}</div>{{end}}
             {{if $r.Error}}<div class="row-error">{{$r.Error}}</div>{{end}}
           </td>
-          <td class="num">{{if $r.Compared}}{{humanSize $r.Total}}{{else}}&mdash;{{end}}</td>
-          <td class="num">{{if $r.Compared}}{{humanSize $r.Shared}}{{else}}&mdash;{{end}}</td>
-          <td class="num">{{if $r.Compared}}{{humanSize $r.Unique}}{{else}}&mdash;{{end}}</td>
-          <td class="num">{{if $r.Compared}}{{$r.NumLayers}}{{else}}&mdash;{{end}}</td>
+          <td class="num">{{if $r.Resolved}}{{humanSize $r.Total}}{{else}}&mdash;{{end}}</td>
+          <td class="num">{{if and $r.Resolved $.Result}}{{humanSize $r.Shared}}{{else}}&mdash;{{end}}</td>
+          <td class="num">{{if and $r.Resolved $.Result}}{{humanSize $r.Unique}}{{else}}&mdash;{{end}}</td>
+          <td class="num">{{if $r.Resolved}}{{$r.NumLayers}}{{else}}&mdash;{{end}}</td>
           <td class="row-actions">
             {{if $r.Error}}
             <button type="button" class="retry" title="Retry"

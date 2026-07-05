@@ -29,13 +29,13 @@ var tmplFS embed.FS
 var staticFS embed.FS
 
 // imageRow is one row in the unified image table: its slot/name, optional per-image error,
-// and (once compared) its size totals.
+// and (once resolved) its size totals.
 type imageRow struct {
 	Slot      string
 	Index     int // position in the canonical (insertion-order) list; used for removal
 	Name      string
 	Error     string // empty when the image resolved successfully
-	Compared  bool   // true when the size fields below are populated
+	Resolved  bool   // true when the image resolved and its Total is known
 	Total     int64
 	Shared    int64
 	Unique    int64
@@ -219,9 +219,9 @@ func envInt(key string, def int) int {
 }
 
 // buildView resolves each image independently — a failure marks only that image's card as
-// invalid (with its error and a retry affordance) rather than blocking the whole view. The
-// shared-size comparison is computed across whichever images resolve, as long as at least
-// two are valid.
+// invalid (with its error and a retry affordance) rather than blocking the whole view. Each
+// resolved image shows its own total size; the shared/unique split is computed only when at
+// least two images resolve.
 //
 // When client holds browser-resolved data for an image, it is used in place of a registry
 // fetch (offloading the server); any image absent from client (or whose data doesn't cover
@@ -285,7 +285,7 @@ func (s *server) buildView(ctx context.Context, rawImages []string, selected str
 			validPlats = append(validPlats, res[i].plats)
 		}
 	}
-	if len(validIdx) < 2 {
+	if len(validIdx) == 0 {
 		return v
 	}
 
@@ -326,10 +326,17 @@ func (s *server) buildView(ctx context.Context, rawImages []string, selected str
 		layerSets = append(layerSets, ls)
 	}
 
-	if len(layerSets) >= 2 {
+	if len(layerSets) == 1 {
+		// Only one image resolved: there's nothing to compare, but its total size
+		// is still known. Show it and leave the shared/unique columns blank.
+		cmp := compare.Images(refStrings, layerSets)
+		v.Rows[comparedIdx[0]].Resolved = true
+		v.Rows[comparedIdx[0]].Total = cmp.Images[0].Total
+		v.Rows[comparedIdx[0]].NumLayers = cmp.Images[0].NumLayers
+	} else if len(layerSets) >= 2 {
 		cmp := compare.Images(refStrings, layerSets)
 		for k, idx := range comparedIdx {
-			v.Rows[idx].Compared = true
+			v.Rows[idx].Resolved = true
 			v.Rows[idx].Total = cmp.Images[k].Total
 			v.Rows[idx].Shared = cmp.Images[k].Shared
 			v.Rows[idx].Unique = cmp.Images[k].Unique
