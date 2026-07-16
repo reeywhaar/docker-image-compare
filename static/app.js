@@ -204,7 +204,15 @@
     return common[0];
   }
 
+  // editMode reports whether the modal is open as "edit" (replace) rather than "add".
+  function editMode() {
+    var el = document.getElementById("dic-mode");
+    return !!el && el.value === "replace";
+  }
+
   // currentImageNames = existing cards + the textarea's lines, normalized, deduped, capped.
+  // In edit mode the textarea IS the full list, so the existing cards are ignored — otherwise a
+  // line the user deleted would linger via its hidden input.
   function currentImageNames() {
     var seen = {}, names = [];
     function add(v) {
@@ -214,7 +222,9 @@
         names.push(n);
       }
     }
-    document.querySelectorAll('#app input[name="image"]').forEach(function (i) { add(i.value); });
+    if (!editMode()) {
+      document.querySelectorAll('#app input[name="image"]').forEach(function (i) { add(i.value); });
+    }
     var ni = document.getElementById("new-image-input");
     if (ni) ni.value.split("\n").forEach(add);
     return names.slice(0, MAX_IMAGES); // silently capped at the max
@@ -308,6 +318,45 @@
     })();
   });
 
+  // dicSetMode switches the modal between "add" (append) and "edit" (replace), updating the
+  // hidden flag posted to the server plus the visible title and submit label.
+  function dicSetMode(mode) {
+    var m = document.getElementById("dic-mode");
+    if (m) m.value = mode;
+    var title = document.getElementById("add-title");
+    var submit = document.getElementById("add-submit");
+    var editing = mode === "replace";
+    if (title) title.textContent = editing ? "Edit images" : "Add images";
+    if (submit) submit.textContent = editing ? "Save" : "Add";
+  }
+
+  // dicOpenAdd opens the modal fresh to append new images.
+  window.dicOpenAdd = function () {
+    var ni = document.getElementById("new-image-input");
+    if (ni) ni.value = "";
+    clearAddError();
+    dicSetMode("");
+    var dlg = document.getElementById("add-dialog");
+    if (dlg) dlg.showModal();
+  };
+
+  // dicOpenEdit opens the modal pre-filled with the current images (one per line); saving
+  // replaces the list rather than appending to it.
+  window.dicOpenEdit = function () {
+    var names = [];
+    document.querySelectorAll('#app input[name="image"]').forEach(function (i) {
+      var v = (i.value || "").trim();
+      if (v) names.push(v);
+    });
+    var ni = document.getElementById("new-image-input");
+    if (ni) ni.value = names.join("\n");
+    clearAddError();
+    dicSetMode("replace");
+    var dlg = document.getElementById("add-dialog");
+    if (dlg) dlg.showModal();
+    if (ni) ni.focus();
+  };
+
   // Modal wiring (static elements present at load): Enter submits, typing clears the
   // error, and closing resets it.
   var input = document.getElementById("new-image-input");
@@ -327,6 +376,7 @@
     dialog.addEventListener("close", function () {
       clearAddError();
       setAddLoading(false);
+      dicSetMode(""); // back to add-mode so later /compare, /remove requests aren't treated as replace
     });
   }
 

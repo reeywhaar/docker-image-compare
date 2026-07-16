@@ -6,7 +6,7 @@
 
   <div class="toolbar">
     <button type="button" class="add" {{if not .CanAdd}}disabled title="Maximum of {{.MaxImages}} images"{{else}}title="Add image"{{end}}
-            onclick="document.getElementById('add-dialog').showModal()">+</button>
+            onclick="dicOpenAdd()">+</button>
   </div>
 
   {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
@@ -50,7 +50,10 @@
   <div class="table-wrap">
     <table class="totals">
       <thead>
-        <tr><th></th><th>Image</th><th>Total</th><th>Shared</th><th>Unique</th><th>Layers</th>
+        <tr><th class="edit-cell">
+            <button type="button" class="edit" title="Edit images" aria-label="Edit images"
+                    onclick="dicOpenEdit()">&#9998;</button>
+          </th><th>Image</th><th>Total</th><th>Shared</th><th>Unique</th><th>Layers</th>
           <th class="clear-cell">
             <button type="button" class="remove" title="Remove all images" aria-label="Remove all images"
                     onclick="if(confirm('Remove all images?'))location.href='/'">&times;</button>

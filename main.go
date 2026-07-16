@@ -160,8 +160,13 @@ func (s *server) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) handleAdd(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	images := r.Form["image"]
-	// The modal textarea holds one image per line; append them all (buildView dedups).
+	var images []string
+	// In edit mode the textarea holds the full replacement list, so the existing images are
+	// dropped; otherwise the textarea lines are appended to them (buildView dedups either way).
+	if r.FormValue("mode") != "replace" {
+		images = r.Form["image"]
+	}
+	// The modal textarea holds one image per line; take them all.
 	for _, line := range strings.Split(r.FormValue("newimage"), "\n") {
 		if line = strings.TrimSpace(line); line != "" {
 			images = append(images, line)

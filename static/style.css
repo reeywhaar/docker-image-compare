@@ -93,7 +93,8 @@ header h1 {
 }
 
 .remove,
-.retry {
+.retry,
+.edit {
   background: none;
   border: none;
   color: var(--muted);
@@ -108,10 +109,14 @@ header h1 {
 .retry {
   font-size: 1.1rem;
 }
+.edit {
+  font-size: 1rem;
+}
 .remove:hover {
   color: var(--danger);
 }
-.retry:hover {
+.retry:hover,
+.edit:hover {
   color: var(--accent);
 }
 /* While a remove/retry request is in flight, swap the glyph for a spinner and dim the affected

@@ -30,7 +30,8 @@
 
   <dialog id="add-dialog">
     <form id="add-form" method="dialog">
-      <h3>Add images</h3>
+      <h3 id="add-title">Add images</h3>
+      <input type="hidden" name="mode" id="dic-mode" value="">
       <textarea id="new-image-input" name="newimage" rows="3"
                 placeholder="nginx:latest&#10;ghcr.io/owner/img:tag&#10;alpine" autocomplete="off" autofocus></textarea>
       <p class="hint">One image per line (up to {{.MaxImages}} total). Public images only; Docker Hub names like <code>nginx</code> resolve automatically. Press <kbd>&#8984;/Ctrl</kbd>+<kbd>Enter</kbd> to add.</p>
@@ -39,7 +40,7 @@
         <button type="button" class="secondary" onclick="document.getElementById('add-dialog').close()">Cancel</button>
         <button type="button" class="primary" id="add-submit"
                 hx-post="/add"
-                hx-include="#app, #new-image-input"
+                hx-include="#app, #new-image-input, #dic-mode"
                 hx-target="#app"
                 hx-swap="outerHTML"
                 hx-on::after-request="if(event.detail.successful){document.getElementById('add-dialog').close();document.getElementById('new-image-input').value=''}">Add</button>
